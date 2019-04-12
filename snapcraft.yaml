@@ -1,0 +1,82 @@
+name: leafpad
+version: '0.8.18.1'
+summary: GTK+ based simple text editor
+description: |
+ Leafpad is a simple GTK+ based text editor with user interface
+ similar to Notepad. It aims to be lighter than Gedit and KWrite,
+ and to be as useful as them.
+
+grade: stable
+confinement: strict
+base: core18
+
+plugs:
+  gtk-2-engines:
+    interface: content
+    target: $SNAP/lib/gtk-2.0
+    default-provider: gtk2-common-themes
+  gtk-2-themes:
+    interface: content
+    target: $SNAP/share/themes
+    default-provider: gtk2-common-themes
+  icon-themes:
+    interface: content
+    target: $SNAP/share/icons
+    default-provider: gtk-common-themes
+
+environment:
+  GTK_PATH: $SNAP/lib/gtk-2.0
+  GTK_DATA_PREFIX: $SNAP
+  XDG_DATA_DIRS: $SNAP/share:$XDG_DATA_DIRS
+
+apps:
+  leafpad:
+    command: bin/desktop-launch leafpad
+    plugs:
+      - avahi-observe
+      - cups-control
+      - desktop
+      - desktop-legacy
+      - gsettings
+      - home
+      - network
+      - mount-observe
+      - removable-media
+      - x11
+    desktop: usr/share/applications/leafpad.desktop
+
+parts:
+  desktop-gtk2:
+    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
+    source-subdir: gtk
+    plugin: make
+    make-parameters: ["FLAVOR=gtk2"]
+    build-packages:
+      - libgtk2.0-dev
+    stage-packages:
+      - libxkbcommon0  # XKB_CONFIG_ROOT
+      - shared-mime-info
+      - libgtk2.0-0
+      - libgdk-pixbuf2.0-0
+      - libglib2.0-bin
+      - libgtk2.0-bin
+      - unity-gtk2-module
+      - locales-all
+      - libappindicator1
+      - xdg-user-dirs
+        
+  leafpad:
+    after: [desktop-gtk2]
+    plugin: autotools
+    source: http://download.savannah.gnu.org/releases/leafpad/leafpad-0.8.18.1.tar.gz
+    configflags: [--prefix=/usr]
+    override-build: |
+      sed -i.bak -e 's|Icon=leafpad$|Icon=${SNAP}/meta/gui/leafpad.svg|g' data/leafpad.desktop.in
+      snapcraftctl build
+      mkdir -p $SNAPCRAFT_PART_INSTALL/meta/gui/
+      cp ../src/data/icons/scalable/leafpad.svg $SNAPCRAFT_PART_INSTALL/meta/gui/
+      cp data/leafpad.desktop $SNAPCRAFT_PART_INSTALL/meta/gui/
+    build-packages:
+      - intltool
+      - libgtk2.0-dev
+      - pkg-config
