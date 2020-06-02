@@ -75,7 +75,7 @@ parts:
   leafpad:
     after: [desktop-gtk2]
     plugin: autotools
-    source: http://download.savannah.gnu.org/releases/leafpad/leafpad-0.8.18.1.tar.gz
+    source: leafpad-0.8.18.1.tar.gz
     configflags: [--prefix=/usr]
     override-build: |
       sed -i.bak -e 's|Icon=leafpad$|Icon=${SNAP}/meta/gui/leafpad.svg|g' data/leafpad.desktop.in
