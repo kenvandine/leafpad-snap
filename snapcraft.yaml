@@ -73,6 +73,8 @@ parts:
       - -usr/lib/*/libicutest.so*
       - -usr/lib/*/libicutu.so*
       - -usr/lib/*/libxkbcommon.so*
+      - -usr/share/doc*
+      - -usr/share/icons
     override-build: |
       craftctl default
       sed -i.bak -e 's|libgtk2.0-0|libgtk2.0-0t64|g' $CRAFT_PART_INSTALL/bin/desktop-launch
